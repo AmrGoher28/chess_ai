@@ -1,7 +1,9 @@
-import chess
+import chess_ai
 
 # create board object
-board=chess.Board()
+board=chess_ai.Board()
 
 # display chess board
 print(board)
+
+
