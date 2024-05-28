@@ -41,7 +41,18 @@ def evaluation_function(board):
     return evaluation
 
 
-def best_move(board):
+
+# implementinf min max algorithm 
+def min_max(board, depth, maximising_player):
+    if depth == 0 or board.is_game_over():
+        return None
+    
+    if maximising_player == False:
+        
+        
+    
+# takes a chess piece if it cans
+def best_move(board , depth):
     best_eval = 140
     best_move = None
 
@@ -49,7 +60,7 @@ def best_move(board):
     # legal_moves = list(board.legal_moves)
     for move in board.legal_moves:
         board.push(move)
-        current_eval = evaluation_function(board)
+        current_eval = min_max(board, depth-1, False )
         board = chess.Board()
         board.set_fen(custom_starting_position)
         if current_eval <= best_eval:
