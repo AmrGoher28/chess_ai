@@ -1,25 +1,24 @@
 import chess
 
 
-board=chess.Board()
+# custom_starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPQPPPP/RNBQKBNR b KQkq - 0 1"
+
+custom_starting_position = "rnbqkbnr/ppp1pppp/8/8/8/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1"
+
+
+# Create a board object and set it to the custom starting position
+board = chess.Board()
+board.set_fen(custom_starting_position)
+
 print(board)
 
 
-# listing all the legal moves in a given state
-legal_moves = list(board.legal_moves)
-for move in legal_moves:
-    print(move)
+
 
 
 # pick the best move from the list of legal moves
-    
+   
 piece_values = {
-    'p': -1,  # Pawn
-    'n': -3,  # Knight
-    'b': -3,  # Bishop
-    'r': -5,  # Rook
-    'q': -9,  # Queen
-    'k': -100,  # King (considerably large negative value to prioritize king's safety)
     'P': 1,   # Pawn
     'N': 3,   # Knight
     'B': 3,   # Bishop
@@ -29,5 +28,37 @@ piece_values = {
     '.': 0    # Empty square
 }
 
-evaluation = sum(piece_values.get(piece, 0) for row in board for piece in row)
-print("Evaluation:", evaluation)
+
+
+# this will evaluate 
+def evaluation_function(board):
+    evaluation = 0
+    for square in chess.SQUARES:
+        piece = board.piece_at(square)
+        if piece and piece.color == chess.WHITE:
+            evaluation = evaluation + piece_values[piece.symbol()]
+
+    return evaluation
+
+
+def best_move(board):
+    best_eval = 140
+    best_move = None
+
+    # listing all the legal moves in a given state
+    # legal_moves = list(board.legal_moves)
+    for move in board.legal_moves:
+        board.push(move)
+        current_eval = evaluation_function(board)
+        board = chess.Board()
+        board.set_fen(custom_starting_position)
+        if current_eval <= best_eval:
+            best_eval = current_eval
+            best_move = move
+
+    return best_move
+
+print(best_move(board))
+
+    
+    
