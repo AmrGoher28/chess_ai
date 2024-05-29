@@ -1,22 +1,7 @@
 import chess
+import random
 
 
-# custom_starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPQPPPP/RNBQKBNR b KQkq - 0 1"
-
-custom_starting_position = "rnbqkbnr/ppp1pppp/8/8/8/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1"
-
-
-# Create a board object and set it to the custom starting position
-board = chess.Board()
-board.set_fen(custom_starting_position)
-
-print(board)
-
-
-
-
-
-# pick the best move from the list of legal moves
    
 piece_values = {
     'P': 1,   # Pawn
@@ -25,51 +10,89 @@ piece_values = {
     'R': 5,   # Rook
     'Q': 9,   # Queen
     'K': 100,  # King (considerably large positive value to prioritize opponent's king's safety)
-    '.': 0    # Empty square
+    '.': 0,  # Empty square
+    'p': -1,  # Pawn (white)
+    'n': -3,  # Knight (white)
+    'b': -3,  # Bishop (white)
+    'r': -5,  # Rook (white)
+    'q': -9,  # Queen (white)
+    'k': -100  # King (white)
 }
 
-
-
-# this will evaluate 
+  
 def evaluation_function(board):
-    evaluation = 0
+    evaluationWhite = 0
+    evaluationBlack = 0
     for square in chess.SQUARES:
         piece = board.piece_at(square)
-        if piece and piece.color == chess.WHITE:
-            evaluation = evaluation + piece_values[piece.symbol()]
+        if piece:
+            if piece.color == chess.WHITE:
+                evaluationWhite += piece_values[piece.symbol()]
+            else:
+                evaluationBlack += piece_values[piece.symbol()]
 
-    return evaluation
+    return evaluationWhite + evaluationBlack
 
 
 
 # implementinf min max algorithm 
-def min_max(board, depth, maximising_player):
+def minimax(board, depth, maximizingPlayer):
     if depth == 0 or board.is_game_over():
-        return None
-    
-    if maximising_player == False:
-        
-        
-    
-# takes a chess piece if it cans
-def best_move(board , depth):
-    best_eval = 140
+        return None, evaluation_function(board)
+
     best_move = None
 
-    # listing all the legal moves in a given state
-    # legal_moves = list(board.legal_moves)
-    for move in board.legal_moves:
-        board.push(move)
-        current_eval = min_max(board, depth-1, False )
-        board = chess.Board()
-        board.set_fen(custom_starting_position)
-        if current_eval <= best_eval:
-            best_eval = current_eval
-            best_move = move
+    if maximizingPlayer:
+        value = float('-inf')
+        for move in board.legal_moves:
+            board.push(move)
+            _, new_value = minimax(board, depth - 1, False)
+            board.pop()
+            if new_value > value:
+                value = new_value
+                best_move = move
+    else:
+        value = float('inf')
+        for move in board.legal_moves:
+            board.push(move)
+            _, new_value = minimax(board, depth - 1, True)
+            board.pop()
+            if new_value < value:
+                value = new_value
+                best_move = move
 
-    return best_move
-
-print(best_move(board))
+    return best_move, value
 
     
-    
+def main():
+    board = chess.Board()
+
+    print("Welcome to Chess against Random AI!")
+    print(board)
+
+    while not board.is_game_over():
+        if board.turn == chess.WHITE:
+            user_move = input("Enter your move (in algebraic notation): ")
+            try:
+                move = chess.Move.from_uci(user_move)
+                if move in board.legal_moves:
+                    board.push(move)
+                    print(board)
+                else:
+                    print("Invalid move! Please try again.")
+            except ValueError:
+                print("Invalid input! Please enter a valid move.")
+        else:
+            ai_move, _ = minimax(board, 3, False)
+            if ai_move is not None:
+                board.push(ai_move)
+                print("AI's move:", ai_move)
+                print(board)
+
+    print("Game over.")
+    print("Result: " + board.result())
+
+
+
+if __name__ == "__main__":
+    main()
