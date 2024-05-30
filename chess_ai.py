@@ -9,7 +9,7 @@ piece_values = {
     'B': 3,   # Bishop
     'R': 5,   # Rook
     'Q': 9,   # Queen
-    'K': 100,  # King (considerably large positive value to prioritize opponent's king's safety)
+    'K': 100,  # King 
     '.': 0,  # Empty square
     'p': -1,  # Pawn (white)
     'n': -3,  # Knight (white)
@@ -72,16 +72,16 @@ def main():
 
     while not board.is_game_over():
         if board.turn == chess.WHITE:
-            user_move = input("Enter your move (in algebraic notation): ")
+            user_move = input("Enter your move : ")
             try:
                 move = chess.Move.from_uci(user_move)
                 if move in board.legal_moves:
                     board.push(move)
                     print(board)
                 else:
-                    print("Invalid move! Please try again.")
+                    print("Invalid move Please try again.")
             except ValueError:
-                print("Invalid input! Please enter a valid move.")
+                print("Invalid input Please enter a valid move.")
         else:
             ai_move, _ = minimax(board, 3, False)
             if ai_move is not None:
